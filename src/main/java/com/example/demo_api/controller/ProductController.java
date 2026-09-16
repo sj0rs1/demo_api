@@ -2,6 +2,7 @@ package com.example.demo_api.controller;
 
 import com.example.demo_api.dto.ProductRequestDTO;
 import com.example.demo_api.dto.ProductResponseDTO;
+import com.example.demo_api.exception.ProductNotFoundException;
 import com.example.demo_api.model.Product;
 import com.example.demo_api.repository.ProductRepository;
 import jakarta.validation.Valid;
@@ -33,7 +34,8 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public ProductResponseDTO getProductById(@PathVariable Long id) {
-        Product product = productRepository.findById(id).orElseThrow();
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
         return toResponseDTO(product);
     }
 
@@ -48,7 +50,8 @@ public class ProductController {
 
     @PutMapping("/{id}")
     public ProductResponseDTO updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequestDTO request) {
-        Product product = productRepository.findById(id).orElseThrow();
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
         product.setName(request.getName());
         product.setPrice(request.getPrice());
         Product saved = productRepository.save(product);
